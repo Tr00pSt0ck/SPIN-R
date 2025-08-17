@@ -2,24 +2,24 @@
   "name": "$PIN£R Slots",
   "short_name": "$PIN£R",
   "description": "$PIN£R Slots Professional Progressive Web App",
-  "start_url": "/index.html",
+  "start_url": "https://tr00pst0ck.github.io/SPIN-R/",
   "display": "fullscreen",
   "orientation": "portrait",
   "theme_color": "#110d4f",
   "background_color": "#110d4a",
   "icons": [
     {
-      "src": "/icons/favicon-192x192.png",
+      "src": "https://tr00pst0ck.github.io/SPIN-R/icons/favicon-192x192.png",
       "sizes": "192x192",
       "type": "image/png"
     },
     {
-      "src": "/icons/favicon-512x512.png",
+      "src": "https://tr00pst0ck.github.io/SPIN-R/icons/favicon-512x512.png",
       "sizes": "512x512",
       "type": "image/png"
     },
     {
-      "src": "/icons/favicon-144x144.png",
+      "src": "https://tr00pst0ck.github.io/SPIN-R/icons/favicon-144x144.png",
       "sizes": "144x144",
       "type": "image/png"
     }
