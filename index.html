@@ -3,21 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <!-- For iOS devices -->
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="$PIN£R Slots">
-    <link rel="apple-touch-icon" href="/icons/favicon-192x192.png">
-
-    <!-- For Windows devices -->
-    <meta name="msapplication-TileImage" content="/icons/favicon-144x144.png">
-    <meta name="msapplication-TileColor" content="#110d4f">
     <title>$PIN£R Slot Machine</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <meta name="theme-color" content="#0a1020">
-    <link rel="manifest" href="manifest.json">
     <style>
-        /* Improved PWA Banner Styles */
+        /* Centered PWA Banner Styles */
         .pwa-banner {
             position: fixed;
             top: -150px;
@@ -25,11 +18,11 @@
             width: 100%;
             background: linear-gradient(to right, #0a1020, #1a2a6c, #0a1020);
             color: white;
-            padding: 12px 15px;
+            padding: 15px;
             display: flex;
-            flex-wrap: wrap;
-            justify-content: space-between;
+            flex-direction: column;
             align-items: center;
+            justify-content: center;
             z-index: 1000;
             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.7);
             border-bottom: 3px solid #ffd700;
@@ -43,42 +36,46 @@
         .pwa-content {
             display: flex;
             align-items: center;
-            gap: 10px;
-            flex: 1;
-            min-width: 250px;
+            gap: 15px;
+            margin-bottom: 15px;
+            width: 100%;
+            max-width: 500px;
+            justify-content: center;
         }
         
         .pwa-icon {
-            font-size: 1.8rem;
+            font-size: 2rem;
             color: #ffd700;
             animation: pulse 2s infinite;
-            flex-shrink: 0;
         }
         
         .pwa-text {
-            font-size: 0.95rem;
-            line-height: 1.4;
+            font-size: 1rem;
+            text-align: center;
+            max-width: 80%;
         }
         
         .pwa-buttons {
             display: flex;
-            gap: 8px;
-            margin-top: 8px;
+            gap: 15px;
+            justify-content: center;
             width: 100%;
-            justify-content: flex-end;
+            max-width: 500px;
         }
         
         .pwa-install-btn {
             background: linear-gradient(45deg, #00a152, #00c853);
             color: white;
             border: none;
-            padding: 8px 15px;
+            padding: 10px 20px;
             border-radius: 30px;
             cursor: pointer;
             font-weight: bold;
             transition: all 0.3s ease;
             box-shadow: 0 3px 8px rgba(0, 0, 0, 0.3);
-            font-size: 0.95rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
         
         .pwa-install-btn:hover {
@@ -90,15 +87,14 @@
             background: rgba(255, 107, 107, 0.2);
             color: #ff6b6b;
             border: 1px solid #ff6b6b;
-            width: 32px;
-            height: 32px;
+            width: 40px;
+            height: 40px;
             border-radius: 50%;
             display: flex;
             justify-content: center;
             align-items: center;
             cursor: pointer;
             transition: all 0.3s ease;
-            flex-shrink: 0;
         }
         
         .pwa-close-btn:hover {
@@ -569,36 +565,33 @@
                 font-size: 0.9rem;
             }
             
-            /* Adjust PWA banner for mobile */
+            /* Centered banner adjustments */
             .pwa-banner {
-                flex-direction: column;
-                padding: 10px;
-                text-align: center;
-                top: -180px;
+                padding: 12px;
             }
             
             .pwa-content {
-                flex-direction: row;
+                flex-direction: column;
+                text-align: center;
                 gap: 10px;
-                margin-bottom: 8px;
-                width: 100%;
-                justify-content: center;
             }
             
             .pwa-text {
                 max-width: 100%;
-                text-align: left;
-                font-size: 0.9rem;
+                font-size: 0.95rem;
             }
             
             .pwa-buttons {
-                margin-top: 5px;
-                width: 100%;
-                justify-content: center;
+                gap: 10px;
+            }
+            
+            .pwa-install-btn {
+                padding: 8px 16px;
+                font-size: 0.95rem;
             }
             
             body.banner-visible {
-                padding-top: 145px;
+                padding-top: 160px;
             }
         }
 
@@ -632,11 +625,20 @@
             }
             
             body.banner-visible {
-                padding-top: 150px;
+                padding-top: 170px;
             }
             
             .pwa-banner {
-                top: -200px;
+                padding: 10px;
+            }
+            
+            .pwa-text {
+                font-size: 0.9rem;
+            }
+            
+            .pwa-install-btn {
+                padding: 7px 14px;
+                font-size: 0.9rem;
             }
         }
 
@@ -713,7 +715,7 @@
     </style>
 </head>
 <body>
-    <!-- PWA Install Banner -->
+    <!-- Centered PWA Install Banner -->
     <div class="pwa-banner" id="pwaBanner">
         <div class="pwa-content">
             <div class="pwa-icon">
@@ -725,7 +727,7 @@
         </div>
         <div class="pwa-buttons">
             <button class="pwa-install-btn" id="installBtn">
-                Install
+                <i class="fas fa-download"></i> Install Now
             </button>
             <div class="pwa-close-btn" id="closeBanner">
                 <i class="fas fa-times"></i>
@@ -1002,29 +1004,17 @@
             
             // PWA Install Logic
             window.addEventListener('beforeinstallprompt', (e) => {
-                // Prevent Chrome from automatically showing prompt
                 e.preventDefault();
-                
-                // Store event for later use
                 deferredPrompt = e;
-                
-                // Re-check visibility since we now know PWA is installable
                 checkBannerVisibility();
             });
             
             // Install button click handler
             installBtn.addEventListener('click', async () => {
                 if (deferredPrompt) {
-                    // Show install prompt
                     deferredPrompt.prompt();
-                    
-                    // Wait for user response
                     const { outcome } = await deferredPrompt.userChoice;
-                    
-                    // Hide banner regardless of choice
                     hideBanner();
-                    
-                    // Clear deferred prompt
                     deferredPrompt = null;
                 }
             });
