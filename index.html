@@ -17,16 +17,17 @@
     <meta name="theme-color" content="#0a1020">
     <link rel="manifest" href="manifest.json">
     <style>
-        /* Added PWA Banner Styles */
+        /* Improved PWA Banner Styles */
         .pwa-banner {
             position: fixed;
-            top: -100px;
+            top: -150px;
             left: 0;
             width: 100%;
             background: linear-gradient(to right, #0a1020, #1a2a6c, #0a1020);
             color: white;
-            padding: 15px 20px;
+            padding: 12px 15px;
             display: flex;
+            flex-wrap: wrap;
             justify-content: space-between;
             align-items: center;
             z-index: 1000;
@@ -42,23 +43,29 @@
         .pwa-content {
             display: flex;
             align-items: center;
-            gap: 15px;
+            gap: 10px;
+            flex: 1;
+            min-width: 250px;
         }
         
         .pwa-icon {
-            font-size: 2rem;
+            font-size: 1.8rem;
             color: #ffd700;
             animation: pulse 2s infinite;
+            flex-shrink: 0;
         }
         
         .pwa-text {
-            font-size: 1rem;
-            max-width: 70%;
+            font-size: 0.95rem;
+            line-height: 1.4;
         }
         
         .pwa-buttons {
             display: flex;
-            gap: 10px;
+            gap: 8px;
+            margin-top: 8px;
+            width: 100%;
+            justify-content: flex-end;
         }
         
         .pwa-install-btn {
@@ -71,6 +78,7 @@
             font-weight: bold;
             transition: all 0.3s ease;
             box-shadow: 0 3px 8px rgba(0, 0, 0, 0.3);
+            font-size: 0.95rem;
         }
         
         .pwa-install-btn:hover {
@@ -90,6 +98,7 @@
             align-items: center;
             cursor: pointer;
             transition: all 0.3s ease;
+            flex-shrink: 0;
         }
         
         .pwa-close-btn:hover {
@@ -105,9 +114,14 @@
         
         /* Adjust body padding when banner is visible */
         body.banner-visible {
-            padding-top: 70px;
+            padding-top: 145px;
         }
         
+        /* Add smooth transition for body padding */
+        body {
+            transition: padding-top 0.5s ease-in-out;
+        }
+
         /* Existing styles remain unchanged */
         * {
             margin: 0;
@@ -125,7 +139,6 @@
             color: white;
             overflow-x: hidden;
             padding: 20px;
-            transition: padding-top 0.5s ease-in-out;
         }
 
         .loading-screen {
@@ -561,21 +574,31 @@
                 flex-direction: column;
                 padding: 10px;
                 text-align: center;
+                top: -180px;
             }
             
             .pwa-content {
-                flex-direction: column;
-                gap: 8px;
+                flex-direction: row;
+                gap: 10px;
+                margin-bottom: 8px;
+                width: 100%;
+                justify-content: center;
             }
             
             .pwa-text {
                 max-width: 100%;
+                text-align: left;
+                font-size: 0.9rem;
             }
             
             .pwa-buttons {
-                margin-top: 10px;
+                margin-top: 5px;
                 width: 100%;
                 justify-content: center;
+            }
+            
+            body.banner-visible {
+                padding-top: 145px;
             }
         }
 
@@ -606,6 +629,14 @@
             .bet-btn {
                 padding: 5px 10px;
                 font-size: 0.8rem;
+            }
+            
+            body.banner-visible {
+                padding-top: 150px;
+            }
+            
+            .pwa-banner {
+                top: -200px;
             }
         }
 
@@ -689,7 +720,7 @@
                 <i class="fas fa-download"></i>
             </div>
             <div class="pwa-text">
-                Install $PIN£R Slot Machine for the best experience! Play anytime, anywhere.
+                Install $PIN£R Slot Machine for the best experience! Play offline.
             </div>
         </div>
         <div class="pwa-buttons">
@@ -929,6 +960,8 @@
             function hideBanner() {
                 pwaBanner.classList.remove('show');
                 document.body.classList.remove('banner-visible');
+                // Store dismissal for 24 hours
+                localStorage.setItem('pwaBannerDismissed', Date.now());
             }
             
             // Check if banner should be shown
@@ -955,12 +988,12 @@
                     }
                 }
                 
-                // Show after 5 seconds if allowed
+                // Show after 3 seconds if allowed
                 if (showBanner) {
                     setTimeout(() => {
                         pwaBanner.classList.add('show');
                         document.body.classList.add('banner-visible');
-                    }, 5000);
+                    }, 3000);
                 }
             }
             
@@ -990,7 +1023,6 @@
                     
                     // Hide banner regardless of choice
                     hideBanner();
-                    localStorage.setItem('pwaBannerDismissed', Date.now());
                     
                     // Clear deferred prompt
                     deferredPrompt = null;
@@ -1000,7 +1032,6 @@
             // Close banner button
             closeBanner.addEventListener('click', () => {
                 hideBanner();
-                localStorage.setItem('pwaBannerDismissed', Date.now());
             });
             
             // Hide loading screen after 2 seconds
