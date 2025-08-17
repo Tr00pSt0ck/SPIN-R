@@ -7,10 +7,10 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="$PIN£R Slots">
-    <link rel="apple-touch-icon" href="https://tr00pst0ck.github.io/SPIN-R/icons/favicon-192x192.png">
+    <link rel="apple-touch-icon" href="/icons/favicon-192x192.png">
 
     <!-- For Windows devices -->
-    <meta name="msapplication-TileImage" content="https://tr00pst0ck.github.io/SPIN-R/icons/favicon-144x144.png">
+    <meta name="msapplication-TileImage" content="/icons/favicon-144x144.png">
     <meta name="msapplication-TileColor" content="#110d4f">
     <title>$PIN£R Slot Machine</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -919,75 +919,82 @@
             const closeBanner = document.getElementById('closeBanner');
             let deferredPrompt = null;
             
+            // Function to check if app is installed
+            function isRunningStandalone() {
+                return window.matchMedia('(display-mode: standalone)').matches || 
+                       window.navigator.standalone;
+            }
+            
             // Function to hide the banner
             function hideBanner() {
                 pwaBanner.classList.remove('show');
                 document.body.classList.remove('banner-visible');
             }
             
+            // Hide banner if already installed
+            if (isRunningStandalone()) {
+                hideBanner();
+            }
+            
             // PWA Install Logic
             window.addEventListener('beforeinstallprompt', (e) => {
-                // Prevent Chrome 67 and earlier from automatically showing the prompt
+                // Prevent Chrome from automatically showing prompt
                 e.preventDefault();
                 
-                // Stash the event so it can be triggered later
+                // Store event for later use
                 deferredPrompt = e;
                 
-                // Show the banner after a delay
-                setTimeout(() => {
-                    // Only show if not dismissed recently
-                    const lastDismissedStr = localStorage.getItem('pwaBannerDismissed');
-                    const oneDay = 24 * 60 * 60 * 1000; // 24 hours in milliseconds
-                    const now = Date.now();
-                    
-                    let showBanner = true;
-                    
-                    if (lastDismissedStr) {
-                        const lastDismissed = parseInt(lastDismissedStr, 10);
-                        if (!isNaN(lastDismissed)) {
-                            if (now - lastDismissed < oneDay) {
-                                showBanner = false;
-                            }
+                // Don't show if app is already installed
+                if (isRunningStandalone()) {
+                    return;
+                }
+                
+                // Check if banner was dismissed in last 24 hours
+                const lastDismissedStr = localStorage.getItem('pwaBannerDismissed');
+                const oneDay = 24 * 60 * 60 * 1000; // 24 hours
+                const now = Date.now();
+                
+                let showBanner = true;
+                
+                if (lastDismissedStr) {
+                    const lastDismissed = parseInt(lastDismissedStr, 10);
+                    if (!isNaN(lastDismissed)) {
+                        if (now - lastDismissed < oneDay) {
+                            showBanner = false;
                         }
                     }
-                    
-                    if (showBanner) {
+                }
+                
+                // Show banner after 5 seconds if allowed
+                if (showBanner) {
+                    setTimeout(() => {
                         pwaBanner.classList.add('show');
                         document.body.classList.add('banner-visible');
-                    }
-                }, 5000); // Show after 5 seconds
+                    }, 5000);
+                }
             });
             
             // Install button click handler
             installBtn.addEventListener('click', async () => {
                 if (deferredPrompt) {
-                    // Show the install prompt
+                    // Show install prompt
                     deferredPrompt.prompt();
                     
-                    // Wait for the user to respond to the prompt
+                    // Wait for user response
                     const { outcome } = await deferredPrompt.userChoice;
                     
-                    // Optionally, send analytics event with outcome of user choice
-                    console.log(`User response to the install prompt: ${outcome}`);
-                    
-                    // Hide the banner regardless of outcome
+                    // Hide banner regardless of choice
                     hideBanner();
-                    // Also record dismissal time to not show again for 24 hours
                     localStorage.setItem('pwaBannerDismissed', Date.now());
                     
-                    // We've used the prompt, and can't use it again, throw it away
+                    // Clear deferred prompt
                     deferredPrompt = null;
-                } else {
-                    // The deferred prompt isn't available, so hide the banner
-                    hideBanner();
-                    localStorage.setItem('pwaBannerDismissed', Date.now());
                 }
             });
             
             // Close banner button
             closeBanner.addEventListener('click', () => {
                 hideBanner();
-                // Store dismissal time in localStorage
                 localStorage.setItem('pwaBannerDismissed', Date.now());
             });
             
