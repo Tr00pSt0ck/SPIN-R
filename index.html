@@ -931,25 +931,15 @@
                 document.body.classList.remove('banner-visible');
             }
             
-            // Hide banner if already installed
-            if (isRunningStandalone()) {
-                hideBanner();
-            }
-            
-            // PWA Install Logic
-            window.addEventListener('beforeinstallprompt', (e) => {
-                // Prevent Chrome from automatically showing prompt
-                e.preventDefault();
-                
-                // Store event for later use
-                deferredPrompt = e;
-                
-                // Don't show if app is already installed
+            // Check if banner should be shown
+            function checkBannerVisibility() {
+                // Hide if already installed
                 if (isRunningStandalone()) {
+                    hideBanner();
                     return;
                 }
                 
-                // Check if banner was dismissed in last 24 hours
+                // Check dismissal history
                 const lastDismissedStr = localStorage.getItem('pwaBannerDismissed');
                 const oneDay = 24 * 60 * 60 * 1000; // 24 hours
                 const now = Date.now();
@@ -965,13 +955,28 @@
                     }
                 }
                 
-                // Show banner after 5 seconds if allowed
+                // Show after 5 seconds if allowed
                 if (showBanner) {
                     setTimeout(() => {
                         pwaBanner.classList.add('show');
                         document.body.classList.add('banner-visible');
                     }, 5000);
                 }
+            }
+            
+            // Initial banner visibility check
+            checkBannerVisibility();
+            
+            // PWA Install Logic
+            window.addEventListener('beforeinstallprompt', (e) => {
+                // Prevent Chrome from automatically showing prompt
+                e.preventDefault();
+                
+                // Store event for later use
+                deferredPrompt = e;
+                
+                // Re-check visibility since we now know PWA is installable
+                checkBannerVisibility();
             });
             
             // Install button click handler
