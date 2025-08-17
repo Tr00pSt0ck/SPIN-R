@@ -917,7 +917,13 @@
             const pwaBanner = document.getElementById('pwaBanner');
             const installBtn = document.getElementById('installBtn');
             const closeBanner = document.getElementById('closeBanner');
-            let deferredPrompt;
+            let deferredPrompt = null;
+            
+            // Function to hide the banner
+            function hideBanner() {
+                pwaBanner.classList.remove('show');
+                document.body.classList.remove('banner-visible');
+            }
             
             // PWA Install Logic
             window.addEventListener('beforeinstallprompt', (e) => {
@@ -927,13 +933,25 @@
                 // Stash the event so it can be triggered later
                 deferredPrompt = e;
                 
-                // Show the banner after a delay only if we have the event
+                // Show the banner after a delay
                 setTimeout(() => {
                     // Only show if not dismissed recently
-                    const lastDismissed = localStorage.getItem('pwaBannerDismissed');
-                    const oneDay = 24 * 60 * 60 * 1000;
+                    const lastDismissedStr = localStorage.getItem('pwaBannerDismissed');
+                    const oneDay = 24 * 60 * 60 * 1000; // 24 hours in milliseconds
+                    const now = Date.now();
                     
-                    if (!lastDismissed || (Date.now() - lastDismissed) > oneDay) {
+                    let showBanner = true;
+                    
+                    if (lastDismissedStr) {
+                        const lastDismissed = parseInt(lastDismissedStr, 10);
+                        if (!isNaN(lastDismissed)) {
+                            if (now - lastDismissed < oneDay) {
+                                showBanner = false;
+                            }
+                        }
+                    }
+                    
+                    if (showBanner) {
                         pwaBanner.classList.add('show');
                         document.body.classList.add('banner-visible');
                     }
@@ -954,11 +972,15 @@
                     
                     // Hide the banner regardless of outcome
                     hideBanner();
+                    // Also record dismissal time to not show again for 24 hours
+                    localStorage.setItem('pwaBannerDismissed', Date.now());
                     
                     // We've used the prompt, and can't use it again, throw it away
                     deferredPrompt = null;
                 } else {
-                    console.log("Install prompt not available");
+                    // The deferred prompt isn't available, so hide the banner
+                    hideBanner();
+                    localStorage.setItem('pwaBannerDismissed', Date.now());
                 }
             });
             
@@ -968,12 +990,6 @@
                 // Store dismissal time in localStorage
                 localStorage.setItem('pwaBannerDismissed', Date.now());
             });
-            
-            // Function to hide the banner
-            function hideBanner() {
-                pwaBanner.classList.remove('show');
-                document.body.classList.remove('banner-visible');
-            }
             
             // Hide loading screen after 2 seconds
             setTimeout(() => {
