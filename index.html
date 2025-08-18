@@ -3,17 +3,24 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- For iOS devices -->
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="$PIN£R Slots">
+    <link rel="apple-touch-icon" href="/icons/favicon-192x192.png">
+
+    <!-- For Windows devices -->
+    <meta name="msapplication-TileImage" content="/icons/favicon-144x144.png">
+    <meta name="msapplication-TileColor" content="#110d4f">
     <title>$PIN£R Slot Machine</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <meta name="theme-color" content="#0a1020">
+    <link rel="manifest" href="manifest.json">
     <style>
         /* Centered PWA Banner Styles */
         .pwa-banner {
             position: fixed;
-            top: -190px;
+            top: -100%;
             left: 0;
             width: 100%;
             background: linear-gradient(to right, #0a1020, #1a2a6c, #0a1020);
@@ -110,7 +117,7 @@
         
         /* Adjust body padding when banner is visible */
         body.banner-visible {
-            padding-top: 145px;
+            padding-top: 140px;
         }
         
         /* Add smooth transition for body padding */
@@ -958,49 +965,37 @@
                        window.navigator.standalone;
             }
             
+            // Function to set app as installed
+            function setAppAsInstalled() {
+                localStorage.setItem('pwaInstalled', 'true');
+                hideBanner();
+            }
+            
             // Function to hide the banner
             function hideBanner() {
                 pwaBanner.classList.remove('show');
                 document.body.classList.remove('banner-visible');
-                // Store dismissal for 24 hours
-                localStorage.setItem('pwaBannerDismissed', Date.now());
             }
             
             // Check if banner should be shown
             function checkBannerVisibility() {
                 // Hide if already installed
-                if (isRunningStandalone()) {
+                if (isRunningStandalone() || localStorage.getItem('pwaInstalled') === 'true') {
                     hideBanner();
                     return;
                 }
                 
-                // Check dismissal history
-                const lastDismissedStr = localStorage.getItem('pwaBannerDismissed');
-                const oneDay = 24 * 60 * 60 * 1000; // 24 hours
-                const now = Date.now();
-                
-                let showBanner = true;
-                
-                if (lastDismissedStr) {
-                    const lastDismissed = parseInt(lastDismissedStr, 10);
-                    if (!isNaN(lastDismissed)) {
-                        if (now - lastDismissed < oneDay) {
-                            showBanner = false;
-                        }
-                    }
-                }
-                
-                // Show after 3 seconds if allowed
-                if (showBanner) {
-                    setTimeout(() => {
-                        pwaBanner.classList.add('show');
-                        document.body.classList.add('banner-visible');
-                    }, 3000);
-                }
+                // Show after 3 seconds
+                setTimeout(() => {
+                    pwaBanner.classList.add('show');
+                    document.body.classList.add('banner-visible');
+                }, 3000);
             }
             
-            // Initial banner visibility check
-            checkBannerVisibility();
+            // Listen for app installation
+            window.addEventListener('appinstalled', () => {
+                setAppAsInstalled();
+            });
             
             // PWA Install Logic
             window.addEventListener('beforeinstallprompt', (e) => {
@@ -1013,8 +1008,17 @@
             installBtn.addEventListener('click', async () => {
                 if (deferredPrompt) {
                     deferredPrompt.prompt();
-                    const { outcome } = await deferredPrompt.userChoice;
-                    hideBanner();
+                    
+                    // Wait for user response
+                    const choiceResult = await deferredPrompt.userChoice;
+                    
+                    if (choiceResult.outcome === 'accepted') {
+                        console.log('User accepted the install prompt');
+                        setAppAsInstalled();
+                    } else {
+                        console.log('User dismissed the install prompt');
+                    }
+                    
                     deferredPrompt = null;
                 }
             });
@@ -1023,6 +1027,13 @@
             closeBanner.addEventListener('click', () => {
                 hideBanner();
             });
+            
+            // Initial banner visibility check
+            if (isRunningStandalone()) {
+                setAppAsInstalled();
+            } else {
+                checkBannerVisibility();
+            }
             
             // Hide loading screen after 2 seconds
             setTimeout(() => {
