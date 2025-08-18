@@ -798,7 +798,7 @@
                 <div class="bet-selector">
                     <div class="bet-btn" data-bet="1">£1</div>
                     <div class="bet-btn" data-bet="5">£5</div>
-                    <div class="bet-btn  active" data-bet="10">£10</div>
+                    <div class="bet-btn active" data-bet="10">£10</div>
                     <div class="bet-btn" data-bet="15">£15</div>
                     <div class="bet-btn" data-bet="20">£20</div>
                     <div class="bet-btn" data-bet="25">£25</div>
@@ -985,11 +985,13 @@
                     return;
                 }
                 
-                // Show after 3 seconds
-                setTimeout(() => {
-                    pwaBanner.classList.add('show');
-                    document.body.classList.add('banner-visible');
-                }, 3000);
+                // Show only if installation is available
+                if (deferredPrompt) {
+                    setTimeout(() => {
+                        pwaBanner.classList.add('show');
+                        document.body.classList.add('banner-visible');
+                    }, 3000);
+                }
             }
             
             // Listen for app installation
@@ -1020,6 +1022,9 @@
                     }
                     
                     deferredPrompt = null;
+                } else {
+                    // Fallback for browsers that don't support PWA installation
+                    alert('To install this app, use the browser menu and select "Install app"');
                 }
             });
             
