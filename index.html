@@ -985,13 +985,11 @@
                     return;
                 }
                 
-                // Show only if installation is available
-                if (deferredPrompt) {
-                    setTimeout(() => {
-                        pwaBanner.classList.add('show');
-                        document.body.classList.add('banner-visible');
-                    }, 3000);
-                }
+                // Show after 3 seconds
+                setTimeout(() => {
+                    pwaBanner.classList.add('show');
+                    document.body.classList.add('banner-visible');
+                }, 3000);
             }
             
             // Listen for app installation
@@ -1022,9 +1020,6 @@
                     }
                     
                     deferredPrompt = null;
-                } else {
-                    // Fallback for browsers that don't support PWA installation
-                    alert('To install this app, use the browser menu and select "Install app"');
                 }
             });
             
